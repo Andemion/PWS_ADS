@@ -16,20 +16,21 @@ function Tweets(){
     }
 
     async function addTweet(event){
-        event.preventDefault()
-        console.log(event)
+        event.preventDefault();
+        
+        const json = {"title":event.target[0].value,"message":event.target[1].value}
         try{
             const response = await fetch(
                 API_URL,{
                    'method': 'POST',
-                   body: JSON.stringify(event),
+                   body: JSON.stringify(json),
                    'headers': {
                     'Content-Type': 'application/json'
                    } 
                 }
             );
             if(response.ok){
-                setTweets([event, ...tweets]);
+                setTweets([json, ...tweets]);
             } else{
                 console.error("Error",response); 
             }
