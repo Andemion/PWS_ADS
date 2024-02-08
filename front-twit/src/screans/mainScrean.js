@@ -19,6 +19,7 @@ function Tweets(){
         event.preventDefault();
         
         const json = {"title":event.target[0].value,"message":event.target[1].value}
+        
         try{
             const response = await fetch(
                 API_URL,{
