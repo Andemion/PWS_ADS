@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import{ openDB } from 'idb';
 
 import Spinner from '../components/Spinner';
 
@@ -11,7 +12,6 @@ function Tweets(){
     async function fetchData(){
         const response = await fetch(API_URL);
         const data = await response.json();
-        console.log(data);
         setTweets(data);
     }
 
@@ -19,12 +19,12 @@ function Tweets(){
         event.preventDefault();
         
         const json = {"title":event.target[0].value,"message":event.target[1].value}
-        
+
         try{
             const response = await fetch(
                 API_URL,{
                    'method': 'POST',
-                   body: JSON.stringify(json),
+                   'body': JSON.stringify(json),
                    'headers': {
                     'Content-Type': 'application/json'
                    } 
@@ -35,8 +35,9 @@ function Tweets(){
             } else{
                 console.error("Error",response); 
             }
-        }catch{
-            
+        }catch(error){
+            alert("pas de connection internet");
+            saveLater(json);
         }
     }
 
@@ -48,6 +49,25 @@ function Tweets(){
         return (
             <Spinner />
         )
+    }
+
+    async function saveLater(json){
+        const dataBase = await openDB(
+            //dbname
+            //version
+            //options
+            "twwetsmessage",
+            1,
+            {
+                upgrade(db){
+                    db.createObjectStore('tweets',{keyPath: 'id',autoIncrement: true})
+                }
+            }
+        );
+        await dataBase.add('tweets', json);
+
+        const serviceWorker = await navigator.serviceWorker.ready;
+        await serviceWorker.sync.register('sync new post');
     }
 
     return (
