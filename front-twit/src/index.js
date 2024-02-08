@@ -2,8 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 
-import Generations from './screens/Generations';
-import PokemonDetail from './screens/PokemonDetail';
+import Tweets from './screans/mainScrean';
 
 import './index.css';
 import App from './App';
@@ -15,12 +14,8 @@ const router = createBrowserRouter([
     children: [
       {
         path: '/',
-        element: <Generations />,
+        element: <Tweets />,
       },
-      {
-        path: '/:name',
-        element: <PokemonDetail />
-      }
     ]
   }
 ]);
