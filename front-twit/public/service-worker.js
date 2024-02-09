@@ -1,3 +1,4 @@
+importScripts('/idb.js')
 const APP_SHELL_CACHE = "app-shell";
 
 const APP_SHELL_FILES = [
@@ -6,13 +7,15 @@ const APP_SHELL_FILES = [
     "/favicon.ico",
     "/static/css/main.e6c13ad2.css",
     "/static/css/main.e6c13ad2.css.map",
-    "/static/js/main.c78e8564.js",
-    "/static/js/main.c78e8564.js.map",
+    "/static/js/main.310579e3.js",
+    "/static/js/main.310579e3.js.map",
     "/manifest.json",
 ];
 
 const ROOT_URL = "http://127.0.0.1:3000";
 const TWEET_DATA_CACHE = "tweet-data";
+const BACKEND_URL = 'http://localhost:9000/api';
+
 
 self.addEventListener('install',function(event){
     event.waitUntil(
@@ -32,8 +35,39 @@ self.addEventListener('fetch',function(event){
     }
     if(APP_SHELL_FILES.includes(event.request.url.replace(ROOT_URL,""))){
         event.respondWith(getFromCache(APP_SHELL_CACHE, event.request));
-    }else if(event.request.url.startsWith('http://localhost:9000/api')){   
+    }else if(event.request.url.startsWith(BACKEND_URL)){   
         event.respondWith(getFromCacheOrNetwork(TWEET_DATA_CACHE, event.request));
+    }
+});
+
+self.addEventListener('sync', function(event){
+    if(event.tag === 'sync-new-post'){
+        idb.openDB('twwetsmessage',1).then(function(database){
+            database.getAll('tweets').then(function(tweets){
+                for(const tweet of tweets){
+                    console.log(tweets,tweet)
+                    fetch(
+                        BACKEND_URL + "/tweets",
+                        {
+                            method:"POST",
+                            body: JSON.stringify(
+                                {
+                                'title': tweet.title,
+                                'message': tweet.message
+                            }),
+                            headers: {'Content-Type': "application/json"}
+                        }
+                    ).then(function(response){
+                        if(response.ok){
+                            database.delete('tweets',tweet.id);
+                            console.log("delete tweet for local base");
+                        }else{
+                            console.log("Couldn't sync a post")
+                        }
+                    })
+                }
+            })
+        })
     }
 });
 
@@ -73,3 +107,37 @@ function getFromCacheOrNetwork(cacheName, request){
         });
     });
 }
+
+/*
+1 stock le post dans idb
+2 emet sync event 
+.... Attente d'internet
+3 Evenement sync réceptionné
+4 Lire idb
+5 Fetch POST dans Backend
+6 Vider la idb
+*/
+
+/*
+nav         sw      function   network
+|
+---->       |
+            | chechk URL
+            ----------> if cache
+            return cache|
+                <-------
+                        |
+                        else
+                        | call 
+                        ----->  |
+                                |
+                        data    |
+                        <-------
+                        |
+                        | 
+                    met en cache
+                data    |
+                <--------
+    data    |
+<-------
+*/

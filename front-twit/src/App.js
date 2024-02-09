@@ -1,6 +1,8 @@
-import { Link, Outlet } from 'react-router-dom'; 
+import { Link, Outlet } from 'react-router-dom';
+import NotificationManager from './components/NotificationManager';
 
 function App() {
+  const displayNotificationManager = 'Notification' in window;
   return (
     <div className="App">
       <Link to="/">
@@ -14,6 +16,7 @@ function App() {
           className="rounded-pill px-3 py-1 mb-2 bg-info-subtle d-inline-block"
         >
           Créé par Arnaud Roussel
+          {displayNotificationManager && <NotificationManager/>}
         </div>
       </div>
     </div>

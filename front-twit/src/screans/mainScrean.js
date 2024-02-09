@@ -67,7 +67,7 @@ function Tweets(){
         await dataBase.add('tweets', json);
 
         const serviceWorker = await navigator.serviceWorker.ready;
-        await serviceWorker.sync.register('sync new post');
+        await serviceWorker.sync.register('sync-new-post');
     }
 
     return (
@@ -83,7 +83,7 @@ function Tweets(){
                         <textarea id="message" name="message"></textarea>
                     </li>
                 </ul>
-                <button type='submit' class="button button-primary" >Poster</button>
+                <button type='submit' className="button button-primary" >Poster</button>
             </form>
 
             {tweets.map((tweet) => {
