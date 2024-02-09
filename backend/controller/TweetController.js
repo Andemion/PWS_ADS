@@ -1,5 +1,14 @@
+require("dotenv").config();
 const { Router } = require("express");
 const Tweets = require("../models/Tweets");
+const Subscriptions = require("../models/Subscriptions")
+const webpush = require('web-push')
+
+webpush.setVapidDetails(
+    'mailto:roussel---arnaud@hotmail.com',
+    process.env.Public_Key,
+    process.env.Private_Key
+)
 
 class TweetNotFoundException extends Error {
     constructor(message) {
@@ -46,6 +55,35 @@ module.exports = function(app, router){
                     title : req.body.title,
                     message : req.body.message
                 }));
+                const serializedSubscription =  await Subscriptions.findAll();
+                for (const sub of serializedSubscription){
+                    const sendsub = {
+                        "endpoint" : sub.endpoint,
+                        'keys': {
+                            "p256dh":sub.key_p256dh,
+                            "auth":sub.key_auth
+                        }
+                    }
+                
+                    const notification = {
+                        "title" : "new tweet",
+                        "body" : "Read the new tweet"
+                    }
+                    webpush.sendNotification(
+                        sendsub,
+                        JSON.stringify(notification)
+                    ).catch(notificationError =>{
+                        if(
+                            notificationError.statusCode == 404
+                            || notificationError.statusCode == 410
+                        ){
+                            console.log('subscription is not valide')
+                            sub.destroy()
+                        }else{
+                            console.log("notificationError" + notificationError)
+                        }
+                    })
+                }
             } catch (error) {
                 throw new TweetBadRequestException();
             }

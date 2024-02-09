@@ -76,11 +76,11 @@ function Tweets(){
                 <ul>
                     <li>
                         <label for="title">Title&nbsp;:</label>
-                        <input type="text" id="title" name="title"/>
+                        <input type="text" id="title" />
                     </li>
                     <li>
                         <label for="message">Message&nbsp;:</label>
-                        <textarea id="message" name="message"></textarea>
+                        <textarea id="message" ></textarea>
                     </li>
                 </ul>
                 <button type='submit' className="button button-primary" >Poster</button>
@@ -88,7 +88,7 @@ function Tweets(){
 
             {tweets.map((tweet) => {
                 return (
-                    <div className="card">
+                    <div className="card" id={tweet.title}>
                     <h5 className="card-title text-center text-capitalize">{tweet.title}</h5>
                         <div className="card-body">
                         <p>{tweet.message}</p> 

@@ -1,7 +1,6 @@
 import { useState } from "react";
-
 import { urlB64ToUint8Array } from "../utils";
-import { json } from "react-router-dom";
+
 
 const Public_Key = 'BMmFlSzEVHh2_fiHvO6F3ea9Rp6G8_5wyPpB7oltj2MMu3l6bjl-iehMKHZSoByEwAQ-p-KBeuP3T6cAShFpH08'
 
@@ -24,10 +23,10 @@ function NotificationManager(props){
 
                 subscription = await serviceWorker.pushManager.subscribe(subscriptionOptions);
             }
-            json = {"endpoint": subscription.endpoint,"key_p256dh": subscription.keys.p256dh, "key_auth": subscription.keys.auth }
+            
             const response = await fetch('http://127.0.0.1:9000/api/subscriptions',{
                 method:'POST',
-                body: JSON.stringify(json),
+                body: JSON.stringify(subscription),
                 headers: {'Content-Type': 'application/json'} 
             });
 
@@ -50,7 +49,7 @@ function NotificationManager(props){
     if(subscribed){
         return (
             <div className="p-3 fixed-bottom end-0">
-                <button onClick={testNotification} className="btn btn-info">
+                <button onClick={testNotification} type='button' className="btn btn-info">
                     Test notif
                 </button>
             </div>

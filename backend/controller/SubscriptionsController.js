@@ -44,8 +44,8 @@ module.exports = function(app, router){
             try {
                 res.send(await Subscriptions.create({
                     endpoint : req.body.endpoint,
-                    key_p256dh : req.body.key_p256dh,
-                    key_auth : req.body.key_auth,
+                    key_p256dh : req.body.keys.p256dh,
+                    key_auth : req.body.keys.auth,
                 }));
             } catch (error) {
                 throw new SubscriptionsBadRequestException();
